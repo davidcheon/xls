@@ -6,7 +6,7 @@ import sys
 import getopt
 import xlrd
 import xlwt
-import string
+class myexception(Exception):pass
 class maker(object):
 	def __init__(self,startnum=1,endnum=50000,contentstart=1,percount=500,wfilename='wfile',sheetname='a sheet'):
 		self.startnum=startnum
@@ -17,9 +17,8 @@ class maker(object):
 		self.contentend=contentstart+endnum-startnum
 		self.wfilename=wfilename
 	def checknumber(self,startnum,endnum):
-		if startnum>endnum:
-			print 'invalid input number'
-			sys.exit(1)
+#		if startnum>endnum:
+#			raise myexception('invalid input number')
 		self.filenumbers=(endnum-startnum)//self.percount
 		self.numberlen=len(str(endnum))
 		self.connumberlen=len(str(self.contentend))
@@ -27,46 +26,50 @@ class maker(object):
 			self.filenumbers+=1
 		self.status=1
 	def startwrite(self):
-		self.checknumber(self.startnum,self.endnum)
-		headers=(u'姓名',u'手机',u'宅话',u'Email',u'地址',u'单位',u'职务')
-		for x in xrange(self.filenumbers):
-			w=xlwt.Workbook()
-			ws=w.add_sheet(self.sheetname)
-			starts=self.startnum+self.percount*x
-			constarts=self.contentstart+self.percount*x
-			if x==self.filenumbers-1:
-				left=(self.endnum-self.startnum)%self.percount
-				if left:
-					ends=starts+left+1
-			else:
-				ends=starts+self.percount
-			interval=0
-			for i,c in enumerate(headers):
-				ws.write(0,i,c)
-				ws.col(i).width=6000 if c==u'手机' else 3000
-			for number in xrange(starts,ends):
-				xline=(number-starts+1)
-				#ws.write(xline,0,'%0{0}d'.format(self.numberlen)%(number))
-				ws.write(xline,0,u'%d号'%(number))
-				ws.write(xline,1,'%0{0}d'.format(self.connumberlen)%(constarts+interval))
-				interval+=1
-			w.save(self.wfilename+str(x+1)+'.xls')
+		try:
+			self.checknumber(self.startnum,self.endnum)
+			headers=(u'姓名',u'手机',u'宅话',u'Email',u'地址',u'单位',u'职务')
+			for x in xrange(self.filenumbers):
+				w=xlwt.Workbook()
+				ws=w.add_sheet(self.sheetname)
+				starts=self.startnum+self.percount*x
+				constarts=self.contentstart+self.percount*x
+				if x==self.filenumbers-1:
+					left=(self.endnum-self.startnum)%self.percount
+					if left:
+						ends=starts+left+1
+				else:
+					ends=starts+self.percount
+				interval=0
+				for i,c in enumerate(headers):
+					ws.write(0,i,c)
+					ws.col(i).width=6000 if c==u'手机' else 3000
+				for number in xrange(starts,ends):
+					xline=(number-starts+1)
+					#ws.write(xline,0,'%0{0}d'.format(self.numberlen)%(number))
+					ws.write(xline,0,u'%d号'%(number))
+					ws.write(xline,1,'%0{0}d'.format(self.connumberlen)%(constarts+interval))
+					interval+=1
+				w.save(self.wfilename+str(x+1)+'.xls')
+		except (Exception,myexception),e:
+			return False,str(e)
+		else:
+			return True,'Write Succeed'
 	def startread(self,filename):
 #		try:
 		bk=xlrd.open_workbook(filename)
 		nsheets=bk.nsheets
-		headers=tuple(string.uppercase)
 		for n in xrange(nsheets):
 			sh=bk.sheet_by_index(n)
 			nrows=sh.nrows
 			ncols=sh.ncols
 			print '%s\tsheetname:%s\trows:%d\tcolumns:%d'%(filename,sh.name,nrows,ncols)
-			print '\t'.join([headers[n] for n in xrange(ncols)])
+			print '\t'.join(['Column'+str(n+1) for n in xrange(ncols)])
 			for r in xrange(nrows):
 				tmp=''
 				for c in xrange(ncols):
 					tmp+='%s\t'%sh.cell_value(r,c)
-				print tmp.rstrip('\t')
+				print '%s\n'%tmp.rstrip('\t')
 #		except Exception,e:
 #			pass
 def showhelp():
@@ -116,8 +119,8 @@ if __name__=='__main__':
 			sys.exit(1)
 		else:
 			m=maker(startnum,endnum,constart,percount,wfilename)
-			m.startwrite()
-			print 'Write Finished'
+			status,info=m.startwrite()
+			print info
 	except getopt.GetoptError,e:
 		print str(e)
 		showhelp()
