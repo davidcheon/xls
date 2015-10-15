@@ -1,8 +1,8 @@
 #!/usr/bin/python
 #!_*_ coding:utf-8 _*_
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 import getopt
 import xlrd
 import xlwt
