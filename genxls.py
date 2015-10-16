@@ -10,10 +10,11 @@ class myexception(Exception):pass
 class maker(object):
 	def __init__(self,startnum=1,endnum=50000,contentstart=1,percount=500,wfilename='wfile',sheetname='a sheet'):
 		self.startnum=startnum
+		self.connumberlen=len(str(contentstart))
 		self.endnum=endnum
 		self.percount=percount
 		self.sheetname=sheetname
-		self.contentstart=contentstart
+		self.contentstart=int(contentstart)
 		self.contentend=contentstart+endnum-startnum
 		self.wfilename=wfilename
 	def checknumber(self,startnum,endnum):
@@ -21,7 +22,7 @@ class maker(object):
 #			raise myexception('invalid input number')
 		self.filenumbers=(endnum-startnum)//self.percount
 		self.numberlen=len(str(endnum))
-		self.connumberlen=len(str(self.contentend))
+#		self.connumberlen=len(str(self.contentend))
 		if(endnum-startnum)%self.percount!=0:
 			self.filenumbers+=1
 		self.status=1
@@ -104,7 +105,7 @@ if __name__=='__main__':
 			elif k in ('-e','--endnum'):
 				endnum=int(v)
 			elif k in ('-c','--constart'):
-				constart=int(v)
+				constart=v
 			elif k in ('-p','--percount'):
 				percount=int(v)
 			elif k in ('-w','--wfilename'):
