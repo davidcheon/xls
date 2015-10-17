@@ -15,7 +15,7 @@ class maker(object):
 		self.percount=percount
 		self.sheetname=sheetname
 		self.contentstart=int(contentstart)
-		self.contentend=contentstart+endnum-startnum
+		self.contentend=self.contentstart+endnum-startnum
 		self.wfilename=wfilename
 	def checknumber(self,startnum,endnum):
 #		if startnum>endnum:
